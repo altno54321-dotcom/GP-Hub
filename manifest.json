@@ -1,0 +1,17 @@
+{
+  "name": "GP Hub",
+  "short_name": "GP Hub",
+  "description": "Minimal F1 Dashboard",
+  "start_url": "/GP-Hub/index.html",
+  "scope": "/GP-Hub/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#e10600",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
