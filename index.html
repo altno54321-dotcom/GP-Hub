@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GP Hub | Minimalist F1 Dashboard</title>
+    
+    <!-- APP SETTINGS ADDED HERE -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <script>
+        // Register the Service Worker to make it installable
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: { f1red: '#e10600', bgdark: '#020617', bgalt: '#0f172a', cardbg: '#1e293b', borderdark: '#334155' },
+                    animation: { 'fade-in': 'fadeIn 0.4s ease-out forwards' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } } }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        ::-webkit-scrollbar-thumb:hover { background: #e10600; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { transition: background-color 0.3s, color 0.3s; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col bg-slate-50 dark:bg-bgdark text-slate-900 dark:text-white relative">
+
+    <!-- FLOATING SCHUMI WITH AUDIO -->
+    <div class="fixed bottom-4 left-4 md:bottom-6 md:left-6 z-50 pointer-events-none">
+        <audio id="f1-audio" src="engine.mp3"></audio>
+        <img src="schumi.png" alt="Schumacher" onclick="playF1Sound()" class="w-24 md:w-32 h-auto drop-shadow-2xl hover:scale-110 transition-transform duration-300 pointer-events-auto filter hover:brightness-110 cursor-pointer" title="Vroom!">
+    </div>
+
+    <!-- Fixed Navbar -->
+    <nav class="fixed top-0 w-full z-40 bg-white/90 dark:bg-bgdark/90 backdrop-blur-lg border-b border-slate-200 dark:border-white/5 px-4 md:px-6 py-3 flex flex-wrap md:flex-nowrap items-center justify-between transition-colors duration-300">
+        <div class="text-xl md:text-2xl font-black tracking-widest flex items-center gap-2 order-1 w-1/2 md:w-auto">
+            <span class="w-2 h-5 md:h-6 bg-f1red rounded-full block"></span>GP<span class="text-slate-400 font-light">HUB</span>
+        </div>
+        
+        <div class="order-2 md:order-3 w-1/2 md:w-auto flex justify-end">
+            <button id="theme-toggle" class="p-2 rounded-full bg-slate-200 dark:bg-cardbg text-slate-700 dark:text-slate-300 hover:text-f1red dark:hover:text-f1red transition-colors duration-300">
+                <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 4.22a1 1 0 011.415 0l.8.8a1 1 0 01-1.414 1.415l-.8-.8a1 1 0 010-1.415zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM14.635 15.636a1 1 0 011.414 0l.8.8a1 1 0 01-1.414 1.414l-.8-.8a1 1 0 010-1.414zM10 16a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-4.22-4.22a1 1 0 01-1.415 0l-.8-.8a1 1 0 011.414-1.415l.8.8a1 1 0 010 1.415zM4 10a1 1 0 01-1 1H2a1 1 0 110-2h1a1 1 0 011 1zM5.365 4.364a1 1 0 010 1.414l-.8.8a1 1 0 01-1.414-1.414l.8-.8a1 1 0 011.414 0zM10 5a5 5 0 100 10 5 5 0 000-10z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+            </button>
+        </div>
+
+        <div class="order-3 md:order-2 w-full md:w-auto mt-3 md:mt-0 flex overflow-x-auto no-scrollbar gap-5 font-medium text-xs md:text-sm text-slate-500 dark:text-slate-400 border-t md:border-none border-slate-200 dark:border-white/5 pt-3 md:pt-0">
+            <a href="#tracker" class="whitespace-nowrap hover:text-slate-900 dark:hover:text-white transition">Tracker</a>
+            <a href="#drivers" class="whitespace-nowrap hover:text-slate-900 dark:hover:text-white transition">Drivers</a>
+            <a href="#teams" class="whitespace-nowrap hover:text-slate-900 dark:hover:text-white transition">Teams</a>
+            <a href="#schedule" class="whitespace-nowrap hover:text-slate-900 dark:hover:text-white transition">Schedule</a>
+            <a href="#news" class="whitespace-nowrap hover:text-slate-900 dark:hover:text-white transition">News</a>
+        </div>
+    </nav>
+
+    <main class="flex-grow pt-[104px] md:pt-20 w-full">
+
+        <!-- LIVE NEXT RACE COUNTDOWN -->
+        <section class="bg-slate-900 text-white py-8 md:py-10 border-b-4 border-f1red bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] relative overflow-hidden">
+            <div class="max-w-5xl mx-auto px-4 md:px-6 text-center relative z-10">
+                <p id="countdown-label" class="text-f1red font-bold tracking-widest uppercase text-xs md:text-sm mb-2">Calculating Next Race...</p>
+                <h1 id="countdown-title" class="text-2xl sm:text-3xl md:text-5xl font-black mb-6 md:mb-8 italic">-</h1>
+                
+                <div class="flex justify-center gap-2 sm:gap-4 md:gap-8 font-mono">
+                    <div class="flex flex-col items-center"><span id="cd-days" class="text-3xl sm:text-4xl md:text-6xl font-black">00</span><span class="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest">Days</span></div>
+                    <span class="text-3xl sm:text-4xl md:text-6xl font-black text-slate-600">:</span>
+                    <div class="flex flex-col items-center"><span id="cd-hours" class="text-3xl sm:text-4xl md:text-6xl font-black">00</span><span class="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest">Hours</span></div>
+                    <span class="text-3xl sm:text-4xl md:text-6xl font-black text-slate-600">:</span>
+                    <div class="flex flex-col items-center"><span id="cd-minutes" class="text-3xl sm:text-4xl md:text-6xl font-black">00</span><span class="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest">Mins</span></div>
+                    <span class="text-3xl sm:text-4xl md:text-6xl font-black text-slate-600">:</span>
+                    <div class="flex flex-col items-center"><span id="cd-seconds" class="text-3xl sm:text-4xl md:text-6xl font-black text-f1red">00</span><span class="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest">Secs</span></div>
+                </div>
+
+                <!-- WATCH NOW BUTTON -->
+                <div id="watch-now-container" class="mt-8 hidden justify-center animate-fade-in">
+                    <a href="https://www.slipstreams.live/" target="_blank" class="bg-f1red text-white px-8 py-3 rounded-full font-bold uppercase tracking-widest text-sm md:text-base hover:bg-red-700 transition shadow-[0_0_20px_rgba(225,6,0,0.6)] animate-pulse flex items-center gap-3 hover:scale-105 duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z" /></svg>
+                        Watch Now
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1. RACE TRACKER SECTION -->
+        <section id="tracker" class="scroll-mt-32 md:scroll-mt-24 py-12 md:py-16 bg-slate-50 dark:bg-bgdark transition-colors duration-300">
+            <div class="max-w-5xl mx-auto px-4 md:px-6">
+                <div class="mb-6 md:mb-8">
+                    <h2 class="text-2xl md:text-3xl font-bold flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-red-600 animate-pulse block"></span>Latest Results</h2>
+                    <p id="race-title" class="text-sm md:text-base text-slate-500 dark:text-slate-400 mt-2">Loading latest session data...</p>
+                </div>
+                <div class="bg-white dark:bg-bgalt border border-slate-200 dark:border-borderdark rounded-2xl overflow-hidden shadow-2xl transition-colors duration-300">
+                    <div class="overflow-x-auto no-scrollbar">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-100 dark:bg-cardbg text-slate-600 dark:text-slate-300 transition-colors duration-300">
+                                <tr>
+                                    <th class="py-3 md:py-4 px-3 md:px-6 font-medium w-10 md:w-16">Pos</th>
+                                    <th class="py-3 md:py-4 px-3 md:px-6 font-medium">Driver</th>
+                                    <th class="py-3 md:py-4 px-6 font-medium hidden md:table-cell">Team</th>
+                                    <th class="py-3 md:py-4 px-6 font-medium hidden sm:table-cell">Time/Status</th>
+                                    <th class="py-3 md:py-4 px-3 md:px-6 font-medium text-right">Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-body" class="divide-y divide-slate-100 dark:divide-white/5">
+                                <tr><td colspan="5" class="py-8 text-center text-slate-500">Connecting to API...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. DRIVER STANDINGS SECTION -->
+        <section id="drivers" class="scroll-mt-32 md:scroll-mt-24 py-12 md:py-16 bg-slate-100 dark:bg-bgalt transition-colors duration-300">
+            <div class="max-w-5xl mx-auto px-4 md:px-6">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Driver Standings</h2>
+                <div class="bg-white dark:bg-bgdark border border-slate-200 dark:border-borderdark rounded-2xl overflow-hidden shadow-xl transition-colors duration-300">
+                    <div class="overflow-x-auto no-scrollbar">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-50 dark:bg-cardbg text-slate-600 dark:text-slate-300 transition-colors duration-300">
+                                <tr>
+                                    <th class="py-3 md:py-4 px-3 md:px-6 font-medium w-10 md:w-16">Rank</th>
+                                    <th class="py-3 md:py-4 px-3 md:px-6 font-medium">Driver</th>
+                                    <th class="py-3 md:py-4 px-6 font-medium hidden md:table-cell">Constructor</th>
+                                    <th class="py-3 md:py-4 px-3 md:px-6 font-medium text-right">Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody id="drivers-body" class="divide-y divide-slate-100 dark:divide-white/5">
+                                <tr><td colspan="4" class="py-8 text-center text-slate-500">Loading standings...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. TEAM STANDINGS SECTION -->
+        <section id="teams" class="scroll-mt-32 md:scroll-mt-24 py-12 md:py-16 bg-slate-50 dark:bg-bgdark transition-colors duration-300">
+            <div class="max-w-5xl mx-auto px-4 md:px-6">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Constructor Standings</h2>
+                <div class="bg-white dark:bg-bgalt border border-slate-200 dark:border-borderdark rounded-2xl overflow-hidden shadow-xl transition-colors duration-300">
+                    <div class="overflow-x-auto no-scrollbar">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-100 dark:bg-cardbg text-slate-600 dark:text-slate-300 transition-colors duration-300">
+                                <tr>
+                                    <th class="py-3 md:py-4 px-3 md:px-6 font-medium w-10 md:w-16">Rank</th>
+                                    <th class="py-3 md:py-4 px-3 md:px-6 font-medium">Team</th>
+                                    <th class="py-3 md:py-4 px-6 font-medium text-right hidden sm:table-cell">Wins</th>
+                                    <th class="py-3 md:py-4 px-3 md:px-6 font-medium text-right">Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teams-body" class="divide-y divide-slate-100 dark:divide-white/5">
+                                <tr><td colspan="4" class="py-8 text-center text-slate-500">Loading teams...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. SCHEDULE SECTION -->
+        <section id="schedule" class="scroll-mt-32 md:scroll-mt-24 py-12 md:py-16 bg-slate-100 dark:bg-bgalt transition-colors duration-300">
+            <div class="max-w-7xl mx-auto px-4 md:px-6">
+                <div class="flex flex-col md:flex-row justify-between md:items-end mb-6 md:mb-8 gap-2">
+                    <div><h2 class="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Race Calendar</h2><p class="text-slate-500 dark:text-slate-400 text-xs md:text-sm">Click on any finished race to view its results.</p></div>
+                </div>
+                <div id="schedule-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    <p class="text-slate-500 py-4 col-span-full">Loading season schedule...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. LATEST NEWS SECTION -->
+        <section id="news" class="scroll-mt-32 md:scroll-mt-24 py-12 md:py-16 bg-slate-50 dark:bg-bgdark transition-colors duration-300">
+            <div class="max-w-7xl mx-auto px-4 md:px-6">
+                <div class="flex justify-between items-center mb-6 md:mb-8">
+                    <h2 class="text-2xl md:text-3xl font-bold">Latest News</h2>
+                    <button onclick="refreshNews()" class="group flex items-center gap-2 text-xs md:text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-cardbg px-3 md:px-4 py-2 rounded-lg border border-slate-200 dark:border-borderdark hover:border-slate-400 dark:hover:border-slate-500 transition duration-300 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3 md:w-4 md:h-4 group-hover:rotate-180 transition duration-500"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg> Refresh
+                    </button>
+                </div>
+                <div id="news-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    <p class="text-slate-500 py-4 col-span-full">Fetching breaking news...</p>
+                </div>
+                <div id="load-more-container" class="mt-8 md:mt-10 flex justify-center hidden">
+                    <button onclick="loadMoreNews()" class="group flex items-center gap-2 text-sm md:text-base text-slate-700 dark:text-slate-300 hover:text-white bg-white hover:bg-slate-800 dark:bg-cardbg dark:hover:bg-slate-700 px-5 md:px-6 py-2 md:py-3 rounded-full border border-slate-200 dark:border-borderdark transition duration-300 shadow-md">
+                        Load More <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 group-hover:translate-y-1 transition duration-300"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-xs md:text-sm text-slate-500 bg-slate-100 dark:bg-bgalt border-t border-slate-200 dark:border-borderdark transition-colors duration-300">
+        <p>GP Hub © 2026. Data via Jolpica-F1 API.</p>
+    </footer>
+
+    <!-- PAST RACE MODAL OVERLAY -->
+    <div id="race-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center p-2 sm:p-4 md:p-10 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-bgalt border border-slate-200 dark:border-borderdark rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="race-modal-content">
+            <div class="px-4 md:px-6 py-4 md:py-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center bg-slate-100 dark:bg-cardbg">
+                <div><h3 id="modal-race-title" class="text-xl md:text-2xl font-bold">Race Results</h3><p class="text-xs md:text-sm text-slate-500 mt-1">Official Final Standings</p></div>
+                <button onclick="closePastRaceModal()" class="text-slate-500 hover:text-f1red bg-slate-200 hover:bg-slate-300 dark:bg-white/5 dark:hover:bg-white/10 p-2 rounded-full transition duration-200">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="overflow-y-auto flex-grow bg-slate-50 dark:bg-bgdark no-scrollbar">
+                <table class="w-full text-left text-sm whitespace-nowrap">
+                    <thead class="bg-slate-100 dark:bg-cardbg text-slate-600 dark:text-slate-300 sticky top-0 shadow-sm md:shadow-md">
+                        <tr>
+                            <th class="py-3 md:py-4 px-3 md:px-6 font-medium w-10 md:w-16">Pos</th>
+                            <th class="py-3 md:py-4 px-3 md:px-6 font-medium">Driver</th>
+                            <th class="py-3 md:py-4 px-6 font-medium hidden md:table-cell">Team</th>
+                            <th class="py-3 md:py-4 px-6 font-medium hidden sm:table-cell">Time / Status</th>
+                            <th class="py-3 md:py-4 px-3 md:px-6 font-medium text-right">Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-leaderboard-body" class="divide-y divide-slate-200 dark:divide-white/5"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Logic -->
+    <script>
+        // F1 Audio Logic
+        function playF1Sound() {
+            const audio = document.getElementById('f1-audio');
+            if(audio) {
+                audio.currentTime = 0; // Reset so you can spam click it!
+                audio.play().catch(e => console.log("Audio play failed:", e));
+            }
+        }
+
+        // Theme Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const darkIcon = document.getElementById('theme-toggle-dark-icon');
+        const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+        function updateThemeIcons() {
+            if (document.documentElement.classList.contains('dark')) {
+                lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden');
+            } else {
+                lightIcon.classList.add('hidden'); darkIcon.classList.remove('hidden');
+            }
+        }
+
+        if (localStorage.getItem('color-theme') === 'light' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+        updateThemeIcons();
+
+        themeToggleBtn.addEventListener('click', function() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark'); localStorage.setItem('color-theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark'); localStorage.setItem('color-theme', 'dark');
+            }
+            updateThemeIcons();
+        });
+
+        // Team Colors & Avatars
+        const teamColors = { "red_bull": "3671C6", "mercedes": "27F4D2", "ferrari": "E80020", "mclaren": "FF8000", "aston_martin": "229971", "alpine": "0093CC", "williams": "005AFF", "rb": "6692FF", "sauber": "00E701", "haas": "B6BABD", "default": "94a3b8" };
+        function getTeamColor(teamId) { return teamColors[teamId] || teamColors["default"]; }
+        function getDriverAvatar(firstName, lastName, teamId) {
+            const color = getTeamColor(teamId);
+            return `https://ui-avatars.com/api/?name=${firstName}+${lastName}&background=${color}&color=fff&rounded=true&bold=true&size=128`;
+        }
+
+        const API_BASE = 'https://api.jolpi.ca/ergast/f1/current';
+        const NEWS_API = 'https://api.rss2json.com/v1/api.json?rss_url=https://www.autosport.com/rss/feed/f1';
+
+        // Countdown Logic
+        let countdownInterval;
+        function startCountdown(raceDateUTC, raceName) {
+            const targetDate = new Date(raceDateUTC).getTime();
+            document.getElementById('countdown-label').innerText = "Next Race:";
+            document.getElementById('countdown-title').innerText = raceName;
+            const watchBtn = document.getElementById('watch-now-container');
+            if (watchBtn) { watchBtn.classList.add('hidden'); watchBtn.classList.remove('flex'); }
+
+            clearInterval(countdownInterval);
+
+            function updateTimer() {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdown-label').innerText = "Race is Live!";
+                    document.getElementById('countdown-title').innerText = raceName + " (Happening Now)";
+                    document.getElementById('cd-days').innerText = "00";
+                    document.getElementById('cd-hours').innerText = "00";
+                    document.getElementById('cd-minutes').innerText = "00";
+                    document.getElementById('cd-seconds').innerText = "00";
+                    if(watchBtn) { watchBtn.classList.remove('hidden'); watchBtn.classList.add('flex'); }
+                    return;
+                }
+
+                document.getElementById('cd-days').innerText = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, '0');
+                document.getElementById('cd-hours').innerText = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+                document.getElementById('cd-minutes').innerText = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+                document.getElementById('cd-seconds').innerText = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
+            }
+
+            updateTimer(); 
+            if (targetDate - new Date().getTime() >= 0) { countdownInterval = setInterval(updateTimer, 1000); }
+        }
+
+        // Schedule
+        async function fetchSchedule() {
+            try {
+                const res = await fetch(`${API_BASE}.json`);
+                const data = await res.json();
+                const races = data.MRData.RaceTable.Races;
+                const container = document.getElementById('schedule-container');
+                container.innerHTML = '';
+                const now = new Date();
+                let nextRaceFound = false;
+
+                races.forEach(race => {
+                    const raceTimeUTC = race.time ? `${race.date}T${race.time}` : `${race.date}T00:00:00Z`;
+                    const raceDateObj = new Date(raceTimeUTC);
+                    const localDate = raceDateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                    const localTime = race.time ? raceDateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : "TBA";
+                    
+                    const isPast = raceDateObj < now;
+                    let badge = '', cardBorder = 'dark:border-borderdark border-slate-200', cardExtraClass = '', onClickAction = '';
+
+                    if (isPast) {
+                        badge = `<span class="bg-slate-200 dark:bg-cardbg text-slate-500 dark:text-slate-400 px-2 py-1 rounded text-[10px] md:text-xs font-semibold">FINISHED</span>`;
+                        cardExtraClass = 'cursor-pointer hover:border-slate-400 group';
+                        const safeRaceName = race.raceName.replace(/'/g, "\\'");
+                        onClickAction = `onclick="openPastRaceModal(${race.round}, '${safeRaceName}')"`;
+                    } else if (!nextRaceFound) {
+                        badge = `<span class="bg-f1red text-white px-2 py-1 rounded text-[10px] md:text-xs font-bold animate-pulse">UPCOMING</span>`;
+                        cardBorder = 'border-f1red/50'; nextRaceFound = true;
+                        startCountdown(raceTimeUTC, race.raceName);
+                    } else {
+                        badge = `<span class="bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 px-2 py-1 rounded text-[10px] md:text-xs font-semibold">SCHEDULED</span>`;
+                    }
+
+                    container.innerHTML += `
+                        <div ${onClickAction} class="bg-white dark:bg-cardbg border ${cardBorder} p-4 md:p-5 rounded-xl flex flex-col justify-between hover:-translate-y-1 hover:shadow-lg transition duration-300 ${cardExtraClass}">
+                            <div>
+                                <div class="flex justify-between items-start mb-3"><span class="text-xs text-slate-400 font-mono">Round ${race.round}</span>${badge}</div>
+                                <h4 class="font-bold text-base md:text-lg leading-tight mb-1">${race.raceName}</h4>
+                                <p class="text-[11px] md:text-xs text-slate-500">${race.Circuit.circuitName}</p>
+                            </div>
+                            <div class="flex justify-between items-center border-t border-slate-100 dark:border-white/5 pt-3 mt-4">
+                                <span class="font-semibold text-sm text-slate-700 dark:text-slate-200">${localDate}</span>
+                                <span class="text-f1red text-sm font-mono font-bold">${localTime}</span>
+                            </div>
+                        </div>`;
+                });
+                if(!nextRaceFound) { document.getElementById('countdown-label').innerText = "Season Complete"; document.getElementById('countdown-title').innerText = "Awaiting Next Season"; }
+            } catch (err) { console.error("Schedule error:", err); }
+        }
+
+        // Generate Table Rows
+        function generateResultRow(row) {
+            const isTop3 = parseInt(row.position) <= 3;
+            const teamId = row.Constructor.constructorId;
+            const avatarUrl = getDriverAvatar(row.Driver.givenName, row.Driver.familyName, teamId);
+            const teamHex = getTeamColor(teamId);
+            
+            return `
+                <tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition duration-200">
+                    <td class="py-3 md:py-4 px-3 md:px-6 text-slate-500 dark:text-slate-400 font-mono"><span style="border-left: 4px solid #${teamHex}" class="pl-2 md:pl-3">${row.position}</span></td>
+                    <td class="py-3 md:py-4 px-3 md:px-6 font-medium ${isTop3 ? 'text-base md:text-lg' : 'text-sm'}">
+                        <div class="flex items-center gap-2 md:gap-3">
+                            <img src="${avatarUrl}" class="w-7 h-7 md:w-9 md:h-9 rounded-full shadow-sm flex-shrink-0" alt="Avatar">
+                            <div class="flex flex-col">
+                                <span>${row.Driver.givenName} <span class="font-bold uppercase">${row.Driver.familyName}</span></span>
+                                <span class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 block md:hidden mt-0.5 leading-tight">${row.Constructor.name} • ${row.Time ? row.Time.time : row.status}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3 md:py-4 px-6 text-slate-500 dark:text-slate-400 hidden md:table-cell">${row.Constructor.name}</td>
+                    <td class="py-3 md:py-4 px-6 text-slate-600 dark:text-slate-300 font-mono text-xs md:text-sm hidden sm:table-cell">${row.Time ? row.Time.time : row.status}</td>
+                    <td class="py-3 md:py-4 px-3 md:px-6 text-right font-bold ${isTop3 ? 'text-f1red' : 'text-slate-600 dark:text-slate-300'}">${row.points}</td>
+                </tr>`;
+        }
+
+        // Leaderboard & Standings
+        async function fetchRaceTracker() {
+            try {
+                const res = await fetch(`${API_BASE}/last/results.json`); const data = await res.json();
+                const races = data.MRData.RaceTable.Races; const tbody = document.getElementById('leaderboard-body');
+                if(races.length === 0) return;
+                const race = races[0]; document.getElementById('race-title').innerText = `${race.season} Season • ${race.raceName} (Round ${race.round})`;
+                tbody.innerHTML = ''; race.Results.forEach(row => { tbody.innerHTML += generateResultRow(row); });
+            } catch (err) { console.error(err); }
+        }
+
+        async function fetchStandings() {
+            try {
+                const [dRes, cRes] = await Promise.all([fetch(`${API_BASE}/driverStandings.json`), fetch(`${API_BASE}/constructorStandings.json`)]);
+                const dData = await dRes.json(); const cData = await cRes.json();
+                
+                const dBody = document.getElementById('drivers-body'); dBody.innerHTML = '';
+                dData.MRData.StandingsTable.StandingsLists[0].DriverStandings.forEach(row => {
+                    const teamId = row.Constructors[0]?.constructorId || 'default';
+                    const avatarUrl = getDriverAvatar(row.Driver.givenName, row.Driver.familyName, teamId);
+                    dBody.innerHTML += `
+                        <tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition duration-200">
+                            <td class="py-3 md:py-4 px-3 md:px-6 text-slate-500 dark:text-slate-400 font-mono"><span style="border-left: 4px solid #${getTeamColor(teamId)}" class="pl-2 md:pl-3">${row.position}</span></td>
+                            <td class="py-3 md:py-4 px-3 md:px-6 font-medium"><div class="flex items-center gap-2 md:gap-3"><img src="${avatarUrl}" class="w-7 h-7 md:w-9 md:h-9 rounded-full shadow-sm flex-shrink-0" alt="Avatar"><div class="flex flex-col"><span class="text-sm md:text-base">${row.Driver.givenName} <span class="font-bold uppercase">${row.Driver.familyName}</span></span><span class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 block md:hidden mt-0.5">${row.Constructors[0]?.name || '-'}</span></div></div></td>
+                            <td class="py-3 md:py-4 px-6 text-slate-500 dark:text-slate-400 hidden md:table-cell">${row.Constructors[0]?.name || '-'}</td>
+                            <td class="py-3 md:py-4 px-3 md:px-6 text-right font-bold text-base md:text-lg">${row.points}</td>
+                        </tr>`;
+                });
+
+                const tBody = document.getElementById('teams-body'); tBody.innerHTML = '';
+                cData.MRData.StandingsTable.StandingsLists[0].ConstructorStandings.forEach(row => {
+                    tBody.innerHTML += `
+                        <tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition duration-200">
+                            <td class="py-3 md:py-4 px-3 md:px-6 text-slate-500 dark:text-slate-400 font-mono">${row.position}</td>
+                            <td class="py-3 md:py-4 px-3 md:px-6 font-bold uppercase tracking-wide flex items-center gap-2 md:gap-3"><span class="w-3 h-3 md:w-4 md:h-4 block rounded-sm shadow-sm flex-shrink-0" style="background-color: #${getTeamColor(row.Constructor.constructorId)}"></span><div class="flex flex-col"><span class="text-sm md:text-base">${row.Constructor.name}</span><span class="text-[10px] text-slate-500 dark:text-slate-400 block sm:hidden mt-0.5 normal-case">${row.wins} Race Wins</span></div></td>
+                            <td class="py-3 md:py-4 px-6 text-right text-slate-500 dark:text-slate-400 hidden sm:table-cell">${row.wins}</td>
+                            <td class="py-3 md:py-4 px-3 md:px-6 text-right font-bold text-base md:text-lg">${row.points}</td>
+                        </tr>`;
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        // Modal Logic
+        async function openPastRaceModal(round, raceName) {
+            const modal = document.getElementById('race-modal'); const modalContent = document.getElementById('race-modal-content'); const tbody = document.getElementById('modal-leaderboard-body');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); modalContent.classList.add('scale-100'); }, 10);
+            document.getElementById('modal-race-title').innerText = raceName; tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-slate-500">Fetching official results...</td></tr>`;
+            try {
+                const res = await fetch(`${API_BASE}/${round}/results.json`); const data = await res.json();
+                const results = data.MRData.RaceTable.Races[0].Results; tbody.innerHTML = ''; results.forEach(row => { tbody.innerHTML += generateResultRow(row); });
+            } catch(e) { tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-red-400">Error loading race results.</td></tr>`; }
+        }
+
+        function closePastRaceModal() {
+            const modal = document.getElementById('race-modal'); const modalContent = document.getElementById('race-modal-content');
+            modal.classList.add('opacity-0'); modalContent.classList.remove('scale-100'); modalContent.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+        document.getElementById('race-modal').addEventListener('click', function(e) { if (e.target === this) closePastRaceModal(); });
+
+        // News
+        let allNewsItems = []; let displayedNewsCount = 0; const NEWS_BATCH_SIZE = 8;
+        async function fetchNews(isRefresh = false) {
+            const container = document.getElementById('news-container'); const loadMoreBtn = document.getElementById('load-more-container');
+            if (isRefresh) { container.innerHTML = '<p class="text-slate-500 py-4 col-span-full">Refreshing news...</p>'; loadMoreBtn.classList.add('hidden'); }
+            try {
+                const cacheBuster = isRefresh ? `&_=${new Date().getTime()}` : '';
+                const res = await fetch(NEWS_API + cacheBuster); const data = await res.json();
+                allNewsItems = data.items || []; displayedNewsCount = 0; container.innerHTML = '';
+                if (allNewsItems.length > 0) renderNewsBatch();
+            } catch (err) { console.error(err); }
+        }
+
+        function renderNewsBatch() {
+            const container = document.getElementById('news-container'); const loadMoreBtn = document.getElementById('load-more-container');
+            const nextBatch = allNewsItems.slice(displayedNewsCount, displayedNewsCount + NEWS_BATCH_SIZE);
+            nextBatch.forEach(article => {
+                const fallbackImg = 'https://images.unsplash.com/photo-1532983330958-4b32abe9deee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                const imageUrl = article.enclosure && article.enclosure.link ? article.enclosure.link : fallbackImg;
+                container.innerHTML += `
+                    <a href="${article.link}" target="_blank" class="opacity-0 animate-fade-in group block bg-white dark:bg-cardbg rounded-xl overflow-hidden border border-slate-200 dark:border-borderdark hover:border-slate-400 dark:hover:border-slate-500 transition duration-300 flex flex-col h-full shadow-sm hover:shadow-md">
+                        <div class="h-40 w-full bg-cover bg-center" style="background-image: url('${imageUrl}')"></div>
+                        <div class="p-4 md:p-5 flex flex-col flex-grow"><h3 class="font-bold text-sm text-slate-800 dark:text-slate-200 group-hover:text-f1red transition leading-snug line-clamp-3 mb-2 md:mb-3">${article.title}</h3><p class="text-xs text-slate-500 mt-auto">${new Date(article.pubDate).toLocaleDateString()}</p></div>
+                    </a>`;
+            });
+            displayedNewsCount += nextBatch.length;
+            displayedNewsCount < allNewsItems.length ? loadMoreBtn.classList.remove('hidden') : loadMoreBtn.classList.add('hidden');
+        }
+
+        function loadMoreNews() { renderNewsBatch(); }
+        function refreshNews() { fetchNews(true); }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchSchedule(); fetchRaceTracker(); fetchStandings(); fetchNews();
+            setInterval(fetchRaceTracker, 60000);
+        });
+    </script>
+</body>
+</html>
