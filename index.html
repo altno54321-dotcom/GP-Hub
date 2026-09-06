@@ -122,43 +122,19 @@
         <!-- TRACKER / OPENF1 HUD SECTION -->
         <section id="tracker" class="scroll-mt-32 md:scroll-mt-24 py-12 md:py-16 bg-slate-50 dark:bg-bgdark transition-colors duration-300">
             <div class="max-w-6xl mx-auto px-4 md:px-6">
-                <!-- Dual-Mode Header Toggle -->
+                
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-4">
                     <div>
                         <h2 class="text-2xl md:text-3xl font-bold flex items-center gap-3">
                             <span class="w-3 h-3 rounded-full bg-red-600 animate-pulse block"></span>
                             <span id="tracker-mode-title">Live Paddock Workspace</span>
                         </h2>
-                        <p id="race-title" class="text-sm text-slate-500 dark:text-slate-400 mt-1">Telemetry and timing logs...</p>
-                    </div>
-                    <div class="flex bg-slate-200 dark:bg-cardbg rounded-xl p-1 text-xs font-bold gap-1 shadow-inner self-stretch sm:self-auto">
-                        <button onclick="switchTrackerMode('jolpica')" id="btn-mode-jolpica" class="flex-grow sm:flex-grow-0 px-4 py-2 rounded-lg bg-f1red text-white shadow transition-all duration-300">Official Classification</button>
-                        <button onclick="switchTrackerMode('openf1')" id="btn-mode-openf1" class="flex-grow sm:flex-grow-0 px-4 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-300">OpenF1 Live Timing</button>
+                        <p id="race-title" class="text-sm text-slate-500 dark:text-slate-400 mt-1">Live telemetry, weather, and circuit radio logs.</p>
                     </div>
                 </div>
 
-                <!-- MODE A: JOLPICA OFFICIAL RESULTS -->
-                <div id="panel-jolpica" class="bg-white dark:bg-bgalt border border-slate-200 dark:border-borderdark rounded-2xl overflow-hidden shadow-2xl transition-all duration-300">
-                    <div class="overflow-x-auto no-scrollbar">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="bg-slate-100 dark:bg-cardbg text-slate-600 dark:text-slate-300">
-                                <tr>
-                                    <th class="py-3 md:py-4 px-3 md:px-6 w-10 md:w-16">Pos</th>
-                                    <th class="py-3 md:py-4 px-3 md:px-6">Driver</th>
-                                    <th class="py-3 md:py-4 px-6 hidden md:table-cell">Team</th>
-                                    <th class="py-3 md:py-4 px-6 hidden sm:table-cell">Time/Status</th>
-                                    <th class="py-3 md:py-4 px-3 md:px-6 text-right">Pts</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leaderboard-body" class="divide-y divide-slate-100 dark:divide-white/5">
-                                <tr><td colspan="5" class="py-8 text-center text-slate-500">Connecting to F1 database...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- MODE B: OPENF1 REAL-TIME COCKPIT -->
-                <div id="panel-openf1" class="hidden flex-col gap-6 animate-fade-in">
+                <!-- OPENF1 REAL-TIME COCKPIT -->
+                <div id="panel-openf1" class="flex flex-col gap-6 animate-fade-in">
                     <!-- Session Marquee + Weather Overlay -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <!-- Flag & Status Card -->
@@ -195,6 +171,30 @@
                         </div>
                     </div>
 
+                    <!-- Classification Table -->
+                    <div class="bg-white dark:bg-bgalt border border-slate-200 dark:border-borderdark rounded-2xl overflow-hidden shadow-2xl transition-all duration-300">
+                        <div class="p-4 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-cardbg flex items-center justify-between">
+                            <h3 class="font-bold text-base">Session Classification</h3>
+                            <span class="text-xs bg-f1red/10 text-f1red px-2.5 py-1 rounded-full font-bold">Official Results</span>
+                        </div>
+                        <div class="overflow-x-auto no-scrollbar">
+                            <table class="w-full text-left text-sm whitespace-nowrap">
+                                <thead class="bg-slate-100 dark:bg-cardbg text-slate-600 dark:text-slate-300">
+                                    <tr>
+                                        <th class="py-3 md:py-4 px-3 md:px-6 w-10 md:w-16">Pos</th>
+                                        <th class="py-3 md:py-4 px-3 md:px-6">Driver</th>
+                                        <th class="py-3 md:py-4 px-6 hidden md:table-cell">Team</th>
+                                        <th class="py-3 md:py-4 px-6 hidden sm:table-cell">Time/Status</th>
+                                        <th class="py-3 md:py-4 px-3 md:px-6 text-right">Pts</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaderboard-body" class="divide-y divide-slate-100 dark:divide-white/5">
+                                    <tr><td colspan="5" class="py-8 text-center text-slate-500">Connecting to session channels...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <!-- Timing and Telemetry workspace -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                         <!-- Left Panel: Timing Tower -->
@@ -213,9 +213,9 @@
                             <!-- Playable Team Radio Logs -->
                             <div class="bg-white dark:bg-bgalt border border-slate-200 dark:border-borderdark p-5 rounded-2xl shadow-xl flex flex-col gap-4">
                                 <h3 class="font-bold text-lg flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-3">
-                                    <span>📻 Playback Team Radio</span>
+                                    <span>📻 Live Team Radio</span>
                                 </h3>
-                                <div id="openf1-radio-feed" class="flex flex-col gap-3.5 max-h-[250px] overflow-y-auto no-scrollbar">
+                                <div id="openf1-radio-feed" class="flex flex-col gap-3.5 max-h-[280px] overflow-y-auto no-scrollbar">
                                     <p class="text-slate-500 text-xs text-center py-6">Connecting to team channels...</p>
                                 </div>
                             </div>
@@ -237,12 +237,7 @@
         <section id="drivers" class="scroll-mt-32 md:scroll-mt-24 py-12 md:py-16 bg-slate-100 dark:bg-bgalt transition-colors duration-300">
             <div class="max-w-5xl mx-auto px-4 md:px-6">
                 <div class="flex justify-between items-center mb-6 md:mb-8 flex-wrap gap-4">
-                    <h2 class="text-2xl md:text-3xl font-bold">Driver Standings</h2>
-                    <!-- Standings Toggle -->
-                    <div class="flex bg-slate-200 dark:bg-bgdark rounded-lg p-1 text-xs font-bold gap-1 shadow-inner">
-                        <button onclick="toggleStandingsMode('official')" id="btn-standings-official" class="px-3 py-1.5 rounded-md bg-f1red text-white shadow transition-all">Season Official</button>
-                        <button onclick="toggleStandingsMode('live')" id="btn-standings-live" class="px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">Live Race points</button>
-                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold">World Drivers' Championship (WDC)</h2>
                 </div>
                 <div class="bg-white dark:bg-bgdark border border-slate-200 dark:border-borderdark rounded-2xl overflow-hidden shadow-xl transition-colors duration-300">
                     <div class="overflow-x-auto no-scrollbar">
@@ -251,7 +246,7 @@
                                 <tr>
                                     <th class="py-3 md:py-4 px-3 md:px-6 w-10 md:w-16">Rank</th>
                                     <th class="py-3 md:py-4 px-3 md:px-6">Driver</th>
-                                    <th class="py-3 md:py-4 px-6 hidden md:table-cell">Constructor</th>
+                                    <th class="py-3 md:py-4 px-6 hidden md:table-cell">Team</th>
                                     <th class="py-3 md:py-4 px-3 md:px-6 text-right">Pts</th>
                                 </tr>
                             </thead>
@@ -264,7 +259,30 @@
             </div>
         </section>
 
-        <section id="teams" class="scroll-mt-32 md:scroll-mt-24 py-12 md:py-16 bg-slate-50 dark:bg-bgdark transition-colors duration-300"><div class="max-w-5xl mx-auto px-4 md:px-6"><h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Constructor Standings</h2><div class="bg-white dark:bg-bgalt border border-slate-200 dark:border-borderdark rounded-2xl overflow-hidden shadow-xl transition-colors duration-300"><div class="overflow-x-auto no-scrollbar"><table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-slate-100 dark:bg-cardbg text-slate-600 dark:text-slate-300"><tr><th class="py-3 md:py-4 px-3 md:px-6 w-10 md:w-16">Rank</th><th class="py-3 md:py-4 px-3 md:px-6">Team</th><th class="py-3 md:py-4 px-6 text-right hidden sm:table-cell">Wins</th><th class="py-3 md:py-4 px-3 md:px-6 text-right">Pts</th></tr></thead><tbody id="teams-body" class="divide-y divide-slate-100 dark:divide-white/5"><tr><td colspan="4" class="py-8 text-center text-slate-500">Loading teams...</td></tr></tbody></table></div></div></div></section>
+        <!-- CONSTRUCTOR STANDINGS SECTION -->
+        <section id="teams" class="scroll-mt-32 md:scroll-mt-24 py-12 md:py-16 bg-slate-50 dark:bg-bgdark transition-colors duration-300">
+            <div class="max-w-5xl mx-auto px-4 md:px-6">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8">World Constructors' Championship (WCC)</h2>
+                <div class="bg-white dark:bg-bgalt border border-slate-200 dark:border-borderdark rounded-2xl overflow-hidden shadow-xl transition-colors duration-300">
+                    <div class="overflow-x-auto no-scrollbar">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-100 dark:bg-cardbg text-slate-600 dark:text-slate-300">
+                                <tr>
+                                    <th class="py-3 md:py-4 px-3 md:px-6 w-10 md:w-16">Rank</th>
+                                    <th class="py-3 md:py-4 px-3 md:px-6">Team</th>
+                                    <th class="py-3 md:py-4 px-3 md:px-6 text-right">Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teams-body" class="divide-y divide-slate-100 dark:divide-white/5">
+                                <tr><td colspan="3" class="py-8 text-center text-slate-500">Loading teams...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CALENDAR SECTION -->
         <section id="schedule" class="scroll-mt-32 md:scroll-mt-24 py-12 md:py-16 bg-slate-100 dark:bg-bgalt transition-colors duration-300"><div class="max-w-7xl mx-auto px-4 md:px-6"><div class="flex flex-col md:flex-row justify-between md:items-end mb-6 md:mb-8 gap-2"><div><h2 class="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Race Calendar</h2><p class="text-slate-500 dark:text-slate-400 text-xs md:text-sm">Click on any finished race to view its results.</p></div></div><div id="schedule-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"><p class="text-slate-500 py-4 col-span-full">Loading season schedule...</p></div></div></section>
 
         <!-- FANTASY PREDICTIONS SECTION -->
@@ -361,7 +379,7 @@
     </main>
 
     <footer class="py-8 text-center text-xs md:text-sm text-slate-500 bg-slate-100 dark:bg-bgalt border-t border-slate-200 dark:border-borderdark transition-colors duration-300">
-        <p>GP Hub © 2026. Data via Jolpica-F1 & OpenF1 APIs.</p>
+        <p>GP Hub © 2026. Data via OpenF1 APIs.</p>
     </footer>
 
     <!-- MODALS -->
@@ -475,7 +493,7 @@
         <div class="bg-white dark:bg-bgalt border border-slate-200 dark:border-borderdark rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="race-modal-content">
             <div class="px-4 md:px-6 py-4 md:py-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center bg-slate-100 dark:bg-cardbg">
                 <div><h3 id="modal-race-title" class="text-xl md:text-2xl font-bold">Race Results</h3><p class="text-xs md:text-sm text-slate-500 mt-1">Official Final Standings</p></div>
-                <button onclick="closePastRaceModal()" class="text-slate-500 hover:text-f1red bg-slate-200 hover:bg-slate-300 dark:bg-white/5 dark:hover:bg-white/10 p-2 rounded-full transition duration-200"><svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <button onclick="closePastRaceModal()" class="text-slate-500 hover:text-f1red bg-slate-200 hover:bg-slate-300 dark:bg-white/5 dark:hover:bg-white/10 p-2 rounded-full transition duration-200"><svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             <div class="overflow-y-auto flex-grow bg-slate-50 dark:bg-bgdark no-scrollbar">
                 <table class="w-full text-left text-sm whitespace-nowrap">
@@ -520,7 +538,6 @@
         let openf1SessionKey = 'latest'; 
         let activeTelemetryInterval = null;
         let activeTelemetryDriver = null;
-        let activeStandingsTab = 'official'; 
         let cachedDriversList = {}; 
 
         auth.onAuthStateChanged(async user => {
@@ -917,13 +934,13 @@
             document.getElementById('pred-race-title').innerText = `Round ${roundInfo.round} Prediction`;
             
             try {
-                const res = await fetch(`https://api.jolpi.ca/ergast/f1/${roundInfo.season}/drivers.json`);
+                const res = await fetch(`${OPENF1_BASE}/drivers?session_key=${openf1SessionKey}`);
                 const data = await res.json();
-                driverList = data.MRData.DriverTable.Drivers;
+                driverList = data;
                 
                 let options = `<option value="">Select a driver...</option>`;
                 driverList.forEach(d => {
-                    options += `<option value="${d.driverId}">${d.givenName} ${d.familyName}</option>`;
+                    options += `<option value="${d.driver_number}">${d.first_name} ${d.last_name}</option>`;
                 });
                 
                 document.getElementById('pred-p1').innerHTML = options;
@@ -977,7 +994,7 @@
                 if(!guesses) { container.innerHTML = '<p class="text-slate-500 text-sm text-center mt-10">No predictions yet. Be the first!</p>'; return; }
                 
                 Object.values(guesses).forEach(g => {
-                    const getDriverName = (id) => { const d = driverList.find(x => x.driverId === id); return d ? d.familyName : id; };
+                    const getDriverName = (id) => { const d = driverList.find(x => x.driver_number == id); return d ? d.last_name : id; };
                     container.innerHTML += `
                         <div class="flex items-center gap-3 p-3 border-b border-slate-200 dark:border-white/5 animate-fade-in">
                             <img src="${g.pfp}" class="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 object-cover">
@@ -1030,10 +1047,7 @@
         if (localStorage.getItem('color-theme') === 'light' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) { document.documentElement.classList.remove('dark'); } else { document.documentElement.classList.add('dark'); } updateThemeIcons();
         themeToggleBtn.addEventListener('click', function() { if (document.documentElement.classList.contains('dark')) { document.documentElement.classList.remove('dark'); localStorage.setItem('color-theme', 'light'); } else { document.documentElement.classList.add('dark'); localStorage.setItem('color-theme', 'dark'); } updateThemeIcons(); });
 
-        const teamColors = { "red_bull": "3671C6", "mercedes": "27F4D2", "ferrari": "E80020", "mclaren": "FF8000", "aston_martin": "229971", "alpine": "0093CC", "williams": "005AFF", "rb": "6692FF", "sauber": "00E701", "haas": "B6BABD", "default": "94a3b8" };
-        function getTeamColor(teamId) { return teamColors[teamId] || teamColors["default"]; } function getDriverAvatar(firstName, lastName, teamId) { return `https://ui-avatars.com/api/?name=${firstName}+${lastName}&background=${getTeamColor(teamId)}&color=fff&rounded=true&bold=true&size=128`; }
-
-        const API_BASE = 'https://api.jolpi.ca/ergast/f1/current'; const NEWS_API = 'https://api.rss2json.com/v1/api.json?rss_url=https://www.autosport.com/rss/feed/f1';
+        const NEWS_API = 'https://api.rss2json.com/v1/api.json?rss_url=https://www.autosport.com/rss/feed/f1';
         let countdownInterval;
         let notifFired = false;
         
@@ -1079,173 +1093,48 @@
             if (targetDate - new Date().getTime() >= 0) { countdownInterval = setInterval(updateTimer, 1000); }
         }
 
-        async function fetchSchedule() {
-            try {
-                let res = await fetch(`${API_BASE}.json`); let data = await res.json();
-                let races = data.MRData.RaceTable.Races;
-                const now = new Date(); 
-                
-                let hasFutureRace = races.some(r => {
-                    const t = r.time ? `${r.date}T${r.time}` : `${r.date}T00:00:00Z`;
-                    return (now.getTime() - new Date(t).getTime()) <= 7200000;
-                });
-
-                if (!hasFutureRace) {
-                    try {
-                        let nextYear = parseInt(data.MRData.RaceTable.season) + 1;
-                        let nextRes = await fetch(`https://api.jolpi.ca/ergast/f1/${nextYear}.json`);
-                        let nextData = await nextRes.json();
-                        if (nextData.MRData.RaceTable.Races.length > 0) races = nextData.MRData.RaceTable.Races;
-                    } catch(e) {}
-                }
-
-                const container = document.getElementById('schedule-container'); container.innerHTML = ''; 
-                let nextRaceFound = false;
-
-                races.forEach(race => {
-                    const raceTimeUTC = race.time ? `${race.date}T${race.time}` : `${race.date}T00:00:00Z`; const raceDateObj = new Date(raceTimeUTC); const localDate = raceDateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); const localTime = race.time ? raceDateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : "TBA";
-                    
-                    const isPast = (now.getTime() - raceDateObj.getTime()) > 7200000; 
-                    let badge = '', cardBorder = 'dark:border-borderdark border-slate-200', cardExtraClass = '', onClickAction = '';
-                    
-                    if (isPast) { badge = `<span class="bg-slate-200 dark:bg-cardbg text-slate-500 dark:text-slate-400 px-2 py-1 rounded text-[10px] md:text-xs font-semibold">FINISHED</span>`; cardExtraClass = 'cursor-pointer hover:border-slate-400 group'; onClickAction = `onclick="openPastRaceModal(${race.round}, '${race.raceName.replace(/'/g, "\\'")}')"`; } 
-                    else if (!nextRaceFound) { 
-                        badge = `<span class="bg-f1red text-white px-2 py-1 rounded text-[10px] md:text-xs font-bold animate-pulse">UPCOMING</span>`; cardBorder = 'border-f1red/50'; nextRaceFound = true; 
-                        startCountdown(raceTimeUTC, race.raceName); 
-                        initPredictions({ season: race.season, round: race.round }); 
-                    } 
-                    else { badge = `<span class="bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 px-2 py-1 rounded text-[10px] md:text-xs font-semibold">SCHEDULED</span>`; }
-                    container.innerHTML += `<div ${onClickAction} class="bg-white dark:bg-cardbg border ${cardBorder} p-4 md:p-5 rounded-xl flex flex-col justify-between hover:-translate-y-1 hover:shadow-lg transition duration-300 ${cardExtraClass}"><div><div class="flex justify-between items-start mb-3"><span class="text-xs text-slate-400 font-mono">Round ${race.round}</span>${badge}</div><h4 class="font-bold text-base md:text-lg leading-tight mb-1">${race.raceName}</h4><p class="text-[11px] md:text-xs text-slate-500">${race.Circuit.circuitName}</p></div><div class="flex justify-between items-center border-t border-slate-100 dark:border-white/5 pt-3 mt-4"><span class="font-semibold text-sm text-slate-700 dark:text-slate-200">${localDate}</span><span class="text-f1red text-sm font-mono font-bold">${localTime}</span></div></div>`;
-                });
-                if(!nextRaceFound) { 
-                    document.getElementById('countdown-label').innerText = "Season Complete"; document.getElementById('countdown-title').innerText = "Awaiting Next Season"; 
-                    const predLocked = document.getElementById('pred-locked-overlay');
-                    if(predLocked) predLocked.classList.remove('hidden');
-                }
-            } catch (err) { console.error("Schedule error:", err); }
-        }
-
-        function generateResultRow(row) {
-            const isTop3 = parseInt(row.position) <= 3; const teamId = row.Constructor.constructorId;
-            return `<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition duration-200"><td class="py-3 md:py-4 px-3 md:px-6 text-slate-500 dark:text-slate-400 font-mono"><span style="border-left: 4px solid #${getTeamColor(teamId)}" class="pl-2 md:pl-3">${row.position}</span></td><td class="py-3 md:py-4 px-3 md:px-6 font-medium ${isTop3 ? 'text-base md:text-lg' : 'text-sm'}"><div class="flex items-center gap-2 md:gap-3"><img src="${getDriverAvatar(row.Driver.givenName, row.Driver.familyName, teamId)}" class="w-7 h-7 md:w-9 md:h-9 rounded-full shadow-sm flex-shrink-0"><div class="flex flex-col"><span>${row.Driver.givenName} <span class="font-bold uppercase">${row.Driver.familyName}</span></span><span class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 block md:hidden mt-0.5 leading-tight">${row.Constructor.name} • ${row.Time ? row.Time.time : row.status}</span></div></div></td><td class="py-3 md:py-4 px-6 text-slate-500 dark:text-slate-400 hidden md:table-cell">${row.Constructor.name}</td><td class="py-3 md:py-4 px-6 text-slate-600 dark:text-slate-300 font-mono text-xs md:text-sm hidden sm:table-cell">${row.Time ? row.Time.time : row.status}</td><td class="py-3 md:py-4 px-3 md:px-6 text-right font-bold ${isTop3 ? 'text-f1red' : 'text-slate-600 dark:text-slate-300'}">${row.points}</td></tr>`;
-        }
-
-        async function fetchRaceTracker() { try { const res = await fetch(`${API_BASE}/last/results.json`); const data = await res.json(); const races = data.MRData.RaceTable.Races; if(races.length === 0) return; document.getElementById('race-title').innerText = `${races[0].season} Season • ${races[0].raceName} (Round ${races[0].round})`; const tbody = document.getElementById('leaderboard-body'); tbody.innerHTML = ''; races[0].Results.forEach(row => { tbody.innerHTML += generateResultRow(row); }); } catch (err) {} }
-        
-        async function fetchStandings() { 
-            try { 
-                const dBody = document.getElementById('drivers-body'); 
-                dBody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-slate-500">Retrieving standings data...</td></tr>';
-                
-                if (activeStandingsTab === 'official') {
-                    const [dRes, cRes] = await Promise.all([fetch(`${API_BASE}/driverStandings.json`), fetch(`${API_BASE}/constructorStandings.json`)]); 
-                    const dData = await dRes.json(); 
-                    const cData = await cRes.json(); 
-                    
-                    dBody.innerHTML = ''; 
-                    dData.MRData.StandingsTable.StandingsLists[0].DriverStandings.forEach(row => { 
-                        const teamId = row.Constructors[0]?.constructorId || 'default'; 
-                        dBody.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition duration-200"><td class="py-3 md:py-4 px-3 md:px-6 text-slate-500 dark:text-slate-400 font-mono"><span style="border-left: 4px solid #${getTeamColor(teamId)}" class="pl-2 md:pl-3">${row.position}</span></td><td class="py-3 md:py-4 px-3 md:px-6 font-medium"><div class="flex items-center gap-2 md:gap-3"><img src="${getDriverAvatar(row.Driver.givenName, row.Driver.familyName, teamId)}" class="w-7 h-7 md:w-9 md:h-9 rounded-full shadow-sm flex-shrink-0"><div class="flex flex-col"><span class="text-sm md:text-base">${row.Driver.givenName} <span class="font-bold uppercase">${row.Driver.familyName}</span></span><span class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 block md:hidden mt-0.5">${row.Constructors[0]?.name || '-'}</span></div></div></td><td class="py-3 md:py-4 px-6 text-slate-500 dark:text-slate-400 hidden md:table-cell">${row.Constructors[0]?.name || '-'}</td><td class="py-3 md:py-4 px-3 md:px-6 text-right font-bold text-base md:text-lg">${row.points}</td></tr>`; 
-                    }); 
-                    
-                    const tBody = document.getElementById('teams-body'); 
-                    tBody.innerHTML = ''; 
-                    cData.MRData.StandingsTable.StandingsLists[0].ConstructorStandings.forEach(row => { 
-                        tBody.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition duration-200"><td class="py-3 md:py-4 px-3 md:px-6 text-slate-500 dark:text-slate-400 font-mono">${row.position}</td><td class="py-3 md:py-4 px-3 md:px-6 font-bold uppercase tracking-wide flex items-center gap-2 md:gap-3"><span class="w-3 h-3 md:w-4 md:h-4 block rounded-sm shadow-sm flex-shrink-0" style="background-color: #${getTeamColor(row.Constructor.constructorId)}"></span><div class="flex flex-col"><span class="text-sm md:text-base">${row.Constructor.name}</span><span class="text-[10px] text-slate-500 dark:text-slate-400 block sm:hidden mt-0.5 normal-case">${row.wins} Race Wins</span></div></td><td class="py-3 md:py-4 px-6 text-right text-slate-500 dark:text-slate-400 hidden sm:table-cell">${row.wins}</td><td class="py-3 md:py-4 px-3 md:px-6 text-right font-bold text-base md:text-lg">${row.points}</td></tr>`; 
-                    }); 
-                } else {
-                    // OpenF1 Live Championship Standings (Beta)
-                    const res = await fetch(`${OPENF1_BASE}/championship_drivers?session_key=${openf1SessionKey}`);
-                    const data = await res.json();
-                    if (!data || data.length === 0) {
-                        dBody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-slate-500">Live standings currently unavailable for this session.</td></tr>';
-                        return;
-                    }
-                    dBody.innerHTML = '';
-                    // Sort by points desc
-                    const sorted = data.sort((a,b) => b.points - a.points);
-                    sorted.forEach((row, idx) => {
-                        const driverMeta = cachedDriversList[row.driver_number] || { first_name: 'Driver', last_name: '#' + row.driver_number, team_name: '-', team_colour: '94a3b8' };
-                        const avatar = `https://ui-avatars.com/api/?name=${driverMeta.first_name}+${driverMeta.last_name}&background=${driverMeta.team_colour}&color=fff&rounded=true&bold=true&size=128`;
-                        dBody.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition duration-200">
-                            <td class="py-3 md:py-4 px-3 md:px-6 text-slate-500 dark:text-slate-400 font-mono"><span style="border-left: 4px solid #${driverMeta.team_colour}" class="pl-2 md:pl-3">${idx+1}</span></td>
-                            <td class="py-3 md:py-4 px-3 md:px-6 font-medium">
-                                <div class="flex items-center gap-2 md:gap-3">
-                                    <img src="${avatar}" class="w-7 h-7 md:w-9 md:h-9 rounded-full shadow-sm flex-shrink-0">
-                                    <div class="flex flex-col">
-                                        <span class="text-sm md:text-base">${driverMeta.first_name} <span class="font-bold uppercase">${driverMeta.last_name}</span></span>
-                                        <span class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 block md:hidden mt-0.5">${driverMeta.team_name}</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-3 md:py-4 px-6 text-slate-500 dark:text-slate-400 hidden md:table-cell">${driverMeta.team_name}</td>
-                            <td class="py-3 md:py-4 px-3 md:px-6 text-right font-bold text-base md:text-lg">${row.points}</td>
-                        </tr>`;
-                    });
-                }
-            } catch (err) {
-                console.error("Standings fetch error: ", err);
-            } 
-        }
-
-        async function openPastRaceModal(round, raceName) {
-            const modal = document.getElementById('race-modal'); const modalContent = document.getElementById('race-modal-content'); const tbody = document.getElementById('modal-leaderboard-body');
-            modal.classList.remove('hidden'); modal.classList.add('flex'); setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); modalContent.classList.add('scale-100'); }, 10);
-            document.getElementById('modal-race-title').innerText = raceName; tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-slate-500">Fetching official results...</td></tr>`;
-            try {
-                const res = await fetch(`${API_BASE}/${round}/results.json`); const data = await res.json();
-                tbody.innerHTML = ''; data.MRData.RaceTable.Races[0].Results.forEach(row => { tbody.innerHTML += generateResultRow(row); });
-            } catch(e) { tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-red-400">Error loading race results.</td></tr>`; }
-        }
-
-        function closePastRaceModal() {
-            const modal = document.getElementById('race-modal'); const modalContent = document.getElementById('race-modal-content');
-            modal.classList.add('opacity-0'); modalContent.classList.remove('scale-100'); modalContent.classList.add('scale-95');
-            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
-        }
-        document.getElementById('race-modal').addEventListener('click', function(e) { if (e.target === this) closePastRaceModal(); });
-
-        let allNewsItems = []; let displayedNewsCount = 0; const NEWS_BATCH_SIZE = 8;
-        async function fetchNews(isRefresh = false) {
-            const container = document.getElementById('news-container'); const loadMoreBtn = document.getElementById('load-more-container');
-            if (isRefresh) { container.innerHTML = '<p class="text-slate-500 py-4 col-span-full">Refreshing news...</p>'; loadMoreBtn.classList.add('hidden'); }
-            try {
-                const res = await fetch(NEWS_API + (isRefresh ? `&_=${new Date().getTime()}` : '')); const data = await res.json();
-                allNewsItems = data.items || []; displayedNewsCount = 0; container.innerHTML = '';
-                if (allNewsItems.length > 0) renderNewsBatch();
-            } catch (err) { console.error(err); }
-        }
-
-        function renderNewsBatch() {
-            const container = document.getElementById('news-container'); const loadMoreBtn = document.getElementById('load-more-container');
-            const nextBatch = allNewsItems.slice(displayedNewsCount, displayedNewsCount + NEWS_BATCH_SIZE);
-            nextBatch.forEach(article => {
-                const imageUrl = article.enclosure && article.enclosure.link ? article.enclosure.link : 'https://images.unsplash.com/photo-1532983330958-4b32abe9deee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-                container.innerHTML += `<a href="${article.link}" target="_blank" class="opacity-0 animate-fade-in group block bg-white dark:bg-cardbg rounded-xl overflow-hidden border border-slate-200 dark:border-borderdark hover:border-slate-400 dark:hover:border-slate-500 transition duration-300 flex flex-col h-full shadow-sm hover:shadow-md"><div class="h-40 w-full bg-cover bg-center" style="background-image: url('${imageUrl}')"></div><div class="p-4 md:p-5 flex flex-col flex-grow"><h3 class="font-bold text-sm text-slate-800 dark:text-slate-200 group-hover:text-f1red transition leading-snug line-clamp-3 mb-2 md:mb-3">${article.title}</h3><p class="text-xs text-slate-500 mt-auto">${new Date(article.pubDate).toLocaleDateString()}</p></div></a>`;
-            });
-            displayedNewsCount += nextBatch.length;
-            displayedNewsCount < allNewsItems.length ? loadMoreBtn.classList.remove('hidden') : loadMoreBtn.classList.add('hidden');
-        }
-        function loadMoreNews() { renderNewsBatch(); } function refreshNews() { fetchNews(true); }
-
         // --- OPENF1 ENGINE INTEGRATION ---
         let openF1TelemetryCache = {};
 
-        async function detectOpenF1Session() {
+        async function initOpenF1Dashboard() {
             try {
-                // Test if live data is available
-                const res = await fetch(`${OPENF1_BASE}/weather?session_key=latest`);
+                // Fetch latest race session to define session scope
+                const res = await fetch(`${OPENF1_BASE}/sessions?session_name=Race`);
                 const data = await res.json();
                 if (data && data.length > 0) {
-                    openf1SessionKey = 'latest';
+                    const latestRace = data[data.length - 1];
+                    openf1SessionKey = latestRace.session_key;
                 } else {
-                    // Fallback to rich historical race (Singapore 2023 GP, Session 9159)
-                    openf1SessionKey = '9159';
+                    openf1SessionKey = '9159'; // Singapore 2023 GP Fallback
                 }
             } catch (err) {
-                openf1SessionKey = '9159'; // Hard fallback
+                openf1SessionKey = '9159'; // Singapore 2023 GP Fallback
             }
+            
+            // Build drivers cache for standard telemetry lookup
+            await loadDriversCache();
+            
+            // Execute unified endpoints mapping
             fetchOpenF1Meta();
+            fetchRaceTracker(); 
+            fetchStandings();
+            fetchNews();
+            fetchSchedule();
+            setInterval(fetchRaceTracker, 60000);
+        }
+
+        async function loadDriversCache() {
+            try {
+                const res = await fetch(`${OPENF1_BASE}/drivers?session_key=${openf1SessionKey}`);
+                const data = await res.json();
+                if (data && data.length > 0) {
+                    data.forEach(d => {
+                        cachedDriversList[d.driver_number] = d;
+                    });
+                }
+            } catch (err) {
+                console.error("Drivers cache initialization failed: ", err);
+            }
         }
 
         async function fetchOpenF1Meta() {
@@ -1272,12 +1161,11 @@
                 
                 if (controlData && controlData.length > 0) {
                     incidentFeed.innerHTML = '';
-                    const logs = controlData.slice(-10).reverse(); // last 10
+                    const logs = controlData.slice(-10).reverse();
                     logs.forEach(msg => {
                         incidentFeed.innerHTML += `<div class="border-b border-slate-100 dark:border-white/5 py-1.5 opacity-90 leading-tight">${msg.message}</div>`;
                     });
 
-                    // Update Flag color based on latest control flag
                     const activeFlag = controlData.find(m => m.flag !== null);
                     if (activeFlag) {
                         flagLabel.innerText = activeFlag.flag;
@@ -1286,7 +1174,7 @@
                     }
                 }
 
-                // Load Team Radio Logs
+                // Load Team Radio Logs with Associated Driver Details
                 const radioRes = await fetch(`${OPENF1_BASE}/team_radio?session_key=${openf1SessionKey}`);
                 const radioData = await radioRes.json();
                 const radioFeed = document.getElementById('openf1-radio-feed');
@@ -1295,8 +1183,9 @@
                     const recentRadio = radioData.slice(-5).reverse();
                     recentRadio.forEach(r => {
                         const driverMeta = cachedDriversList[r.driver_number] || { first_name: 'Driver', last_name: '#' + r.driver_number, team_colour: '94a3b8' };
+                        const nameDisplay = `${driverMeta.first_name} ${driverMeta.last_name.toUpperCase()}`;
                         radioFeed.innerHTML += `<div class="flex flex-col gap-1.5 p-2.5 rounded-lg bg-slate-100 dark:bg-cardbg border-l-4" style="border-color: #${driverMeta.team_colour || 'e10600'}">
-                            <span class="text-xs font-bold font-mono">📻 ${driverMeta.first_name} ${driverMeta.last_name} (${r.driver_number})</span>
+                            <span class="text-xs font-bold font-mono">📻 ${nameDisplay} (#${r.driver_number})</span>
                             <audio controls src="${r.recording_url}" class="w-full h-8 outline-none mt-1"></audio>
                         </div>`;
                     });
@@ -1304,7 +1193,6 @@
                     radioFeed.innerHTML = '<p class="text-slate-500 text-xs text-center py-6">No radio logs available.</p>';
                 }
 
-                // Load timing & telemetry list
                 fetchOpenF1TimingTower();
 
             } catch (err) {
@@ -1339,21 +1227,14 @@
                 const laps = await lapsRes.json();
                 const pits = await pitRes.json();
 
-                // Cache driver profiles for standings toggling
-                drivers.forEach(d => {
-                    cachedDriversList[d.driver_number] = d;
-                });
-
                 const tower = document.getElementById('openf1-timing-tower');
                 tower.innerHTML = '';
 
-                // Get latest positions for all drivers
                 let latestPositions = {};
                 positions.forEach(pos => {
                     latestPositions[pos.driver_number] = pos.position;
                 });
 
-                // Sort active drivers based on position rank
                 const activeDrivers = drivers.filter(d => latestPositions[d.driver_number] !== undefined)
                                              .sort((a,b) => latestPositions[a.driver_number] - latestPositions[b.driver_number]);
 
@@ -1366,29 +1247,26 @@
                     const dNum = d.driver_number;
                     const pos = latestPositions[dNum];
                     
-                    // Gap to leader & Interval
                     const dIntervals = intervals.filter(i => i.driver_number === dNum);
                     const latestInterval = dIntervals.length > 0 ? dIntervals[dIntervals.length - 1] : { gap_to_leader: 'N/A', interval: '-' };
 
-                    // Lap details
                     const dLaps = laps.filter(l => l.driver_number === dNum);
                     const latestLap = dLaps.length > 0 ? dLaps[dLaps.length - 1] : null;
 
-                    // Pit & Tyre details
                     const dPits = pits.filter(p => p.driver_number === dNum);
                     const pitCount = dPits.length;
                     const tyreCompound = latestLap && latestLap.compound ? latestLap.compound : 'HARD';
 
-                    const avatar = `https://ui-avatars.com/api/?name=${d.given_name}+${d.family_name}&background=${d.team_colour}&color=fff&rounded=true&bold=true&size=128`;
+                    const avatar = d.headshot_url || `https://ui-avatars.com/api/?name=${d.given_name}+${d.family_name}&background=${d.team_colour}&color=fff&rounded=true&bold=true&size=128`;
 
                     tower.innerHTML += `
                         <div class="bg-white dark:bg-bgalt border border-slate-200 dark:border-borderdark rounded-xl p-4 shadow-sm flex flex-col gap-3 transition-transform duration-300">
                             <div class="flex items-center justify-between flex-wrap gap-2">
                                 <div class="flex items-center gap-3">
-                                    <span class="text-sm font-black font-mono w-6 text-slate-400">P${pos}</span>
-                                    <img src="${avatar}" class="w-9 h-9 rounded-full object-cover shadow-sm">
+                                    <span class="text-sm font-black font-mono w-6 text-slate-400 font-bold">P${pos}</span>
+                                    <img src="${avatar}" class="w-9 h-9 rounded-full object-cover shadow-sm bg-slate-100 dark:bg-slate-800">
                                     <div class="flex flex-col min-w-0">
-                                        <span class="text-sm font-black truncate">${d.first_name} ${d.last_name} <span class="text-xs text-slate-400 font-normal">#${dNum}</span></span>
+                                        <span class="text-sm font-black truncate">${d.first_name} ${d.last_name.toUpperCase()} <span class="text-xs text-slate-400 font-normal">#${dNum}</span></span>
                                         <span class="text-[10px] text-slate-400 truncate">${d.team_name}</span>
                                     </div>
                                 </div>
@@ -1406,7 +1284,6 @@
                                 <div class="flex flex-col"><span class="text-slate-400">Last Lap</span><span class="font-bold text-f1red mt-0.5">${latestLap && latestLap.lap_duration ? latestLap.lap_duration.toFixed(3) + 's' : 'In Garage'}</span></div>
                             </div>
 
-                            <!-- Interactive Telemetry Panel -->
                             <div id="telemetry-panel-${dNum}" class="hidden flex-col gap-3 bg-slate-50 dark:bg-cardbg p-3.5 rounded-xl border border-slate-200 dark:border-white/5 animate-fade-in text-[10px] font-mono mt-1">
                                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                                     <div><span class="text-slate-400">RPM</span><div id="tel-rpm-${dNum}" class="text-sm font-black text-slate-800 dark:text-slate-100">0</div></div>
@@ -1450,7 +1327,6 @@
             if (!panel) return;
 
             if (panel.classList.contains('hidden')) {
-                // Close active panel first
                 if (activeTelemetryDriver) {
                     const prevPanel = document.getElementById(`telemetry-panel-${activeTelemetryDriver}`);
                     if (prevPanel) prevPanel.classList.add('hidden');
@@ -1461,7 +1337,6 @@
                 panel.classList.add('flex');
                 activeTelemetryDriver = driverNum;
 
-                // Load initial telemetry block to prevent massive session loading
                 try {
                     const lapsRes = await fetch(`${OPENF1_BASE}/laps?session_key=${openf1SessionKey}&driver_number=${driverNum}`);
                     const lapsData = await lapsRes.json();
@@ -1470,7 +1345,6 @@
                         lapStartUTC = lapsData[lapsData.length - 1].date_start;
                     }
 
-                    // Query car telemetry starting from this lap's timestamp to keep payload lightweight
                     const telUrl = lapStartUTC 
                         ? `${OPENF1_BASE}/car_data?session_key=${openf1SessionKey}&driver_number=${driverNum}&date>=${lapStartUTC}`
                         : `${OPENF1_BASE}/car_data?session_key=${openf1SessionKey}&driver_number=${driverNum}`;
@@ -1482,10 +1356,9 @@
                         openF1TelemetryCache[driverNum] = telData;
                         let ptr = 0;
 
-                        // Stream inputs at 300ms (~3.3Hz matches OpenF1)
                         activeTelemetryInterval = setInterval(() => {
                             if (!openF1TelemetryCache[driverNum] || ptr >= openF1TelemetryCache[driverNum].length) {
-                                ptr = 0; // loop
+                                ptr = 0; 
                             }
                             const record = openF1TelemetryCache[driverNum][ptr];
                             if (record) {
@@ -1522,56 +1395,307 @@
             document.getElementById(`tel-brake-bar-${driverNum}`).style.width = `${brake}%`;
         }
 
-        function switchTrackerMode(mode) {
-            const btnJolpica = document.getElementById('btn-mode-jolpica');
-            const btnOpenf1 = document.getElementById('btn-mode-openf1');
-            const panelJolpica = document.getElementById('panel-jolpica');
-            const panelOpenf1 = document.getElementById('panel-openf1');
+        async function fetchRaceTracker() { 
+            try { 
+                const res = await fetch(`${OPENF1_BASE}/session_result?session_key=${openf1SessionKey}`); 
+                const data = await res.json(); 
+                
+                const tbody = document.getElementById('leaderboard-body'); 
+                tbody.innerHTML = ''; 
+                
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-500">No race results recorded yet for this session.</td></tr>';
+                    return;
+                }
 
-            if (mode === 'jolpica') {
-                btnJolpica.className = "px-4 py-2 rounded-lg bg-f1red text-white shadow transition-all duration-300";
-                btnOpenf1.className = "px-4 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-300";
-                panelJolpica.classList.remove('hidden');
-                panelOpenf1.classList.add('hidden');
-                clearInterval(activeTelemetryInterval);
-            } else {
-                btnOpenf1.className = "px-4 py-2 rounded-lg bg-f1red text-white shadow transition-all duration-300";
-                btnJolpica.className = "px-4 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-300";
-                panelOpenf1.classList.remove('hidden');
-                panelOpenf1.classList.add('flex');
-                panelJolpica.classList.add('hidden');
-                detectOpenF1Session();
+                const sorted = data.sort((a,b) => a.position - b.position);
+                
+                sorted.forEach(row => {
+                    const driverMeta = cachedDriversList[row.driver_number] || { first_name: 'Driver', last_name: '#' + row.driver_number, team_name: '-', team_colour: '94a3b8' };
+                    const avatar = driverMeta.headshot_url || `https://ui-avatars.com/api/?name=${driverMeta.first_name}+${driverMeta.last_name}&background=${driverMeta.team_colour}&color=fff&rounded=true&bold=true&size=128`;
+                    
+                    let gapStatus = row.gap_to_leader === null ? 'Leader' : '+' + row.gap_to_leader + 's';
+                    if (row.dnf) gapStatus = 'DNF';
+                    if (row.dsq) gapStatus = 'DSQ';
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition duration-200">
+                            <td class="py-3 md:py-4 px-3 md:px-6 text-slate-500 dark:text-slate-400 font-mono">
+                                <span style="border-left: 4px solid #${driverMeta.team_colour}" class="pl-2 md:pl-3">${row.position}</span>
+                            </td>
+                            <td class="py-3 md:py-4 px-3 md:px-6 font-medium">
+                                <div class="flex items-center gap-2 md:gap-3">
+                                    <img src="${avatar}" class="w-7 h-7 md:w-9 md:h-9 rounded-full shadow-sm flex-shrink-0 object-cover bg-slate-100 dark:bg-slate-800">
+                                    <div class="flex flex-col">
+                                        <span>${driverMeta.first_name} <span class="font-bold uppercase">${driverMeta.last_name}</span></span>
+                                        <span class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 block md:hidden mt-0.5 leading-tight">${driverMeta.team_name} • ${gapStatus}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3 md:py-4 px-6 text-slate-500 dark:text-slate-400 hidden md:table-cell">${driverMeta.team_name}</td>
+                            <td class="py-3 md:py-4 px-6 text-slate-600 dark:text-slate-300 font-mono text-xs md:text-sm hidden sm:table-cell">${gapStatus}</td>
+                            <td class="py-3 md:py-4 px-3 md:px-6 text-right font-bold text-slate-600 dark:text-slate-300">${row.points}</td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error(err);
+            } 
+        }
+
+        async function fetchStandings() { 
+            try { 
+                const dBody = document.getElementById('drivers-body'); 
+                const tBody = document.getElementById('teams-body');
+                dBody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-slate-500">Retrieving standings data...</td></tr>';
+                tBody.innerHTML = '<tr><td colspan="3" class="py-8 text-center text-slate-500">Retrieving standings data...</td></tr>';
+                
+                // Fetch championship drivers (Beta)
+                const dRes = await fetch(`${OPENF1_BASE}/championship_drivers?session_key=${openf1SessionKey}`);
+                const dData = await dRes.json();
+                
+                if (!dData || dData.length === 0) {
+                    dBody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-slate-500">Standings currently unavailable for this session.</td></tr>';
+                    tBody.innerHTML = '<tr><td colspan="3" class="py-8 text-center text-slate-500">Standings currently unavailable for this session.</td></tr>';
+                    return;
+                }
+                
+                dBody.innerHTML = '';
+                const sortedDrivers = dData.sort((a,b) => b.points - a.points);
+                sortedDrivers.forEach((row, idx) => {
+                    const driverMeta = cachedDriversList[row.driver_number] || { first_name: 'Driver', last_name: '#' + row.driver_number, team_name: '-', team_colour: '94a3b8' };
+                    const avatar = driverMeta.headshot_url || `https://ui-avatars.com/api/?name=${driverMeta.first_name}+${driverMeta.last_name}&background=${driverMeta.team_colour}&color=fff&rounded=true&bold=true&size=128`;
+                    
+                    dBody.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition duration-200">
+                        <td class="py-3 md:py-4 px-3 md:px-6 text-slate-500 dark:text-slate-400 font-mono"><span style="border-left: 4px solid #${driverMeta.team_colour}" class="pl-2 md:pl-3">${idx + 1}</span></td>
+                        <td class="py-3 md:py-4 px-3 md:px-6 font-medium">
+                            <div class="flex items-center gap-2 md:gap-3">
+                                <img src="${avatar}" class="w-9 h-9 rounded-full shadow-sm flex-shrink-0 object-cover bg-slate-100 dark:bg-slate-800">
+                                <div class="flex flex-col">
+                                    <span class="text-sm md:text-base">${driverMeta.first_name} <span class="font-bold uppercase">${driverMeta.last_name}</span></span>
+                                    <span class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 block md:hidden mt-0.5">${driverMeta.team_name}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 md:py-4 px-6 text-slate-500 dark:text-slate-400 hidden md:table-cell">${driverMeta.team_name}</td>
+                        <td class="py-3 md:py-4 px-3 md:px-6 text-right font-bold text-base md:text-lg">${row.points}</td>
+                    </tr>`;
+                });
+
+                // Fetch championship teams (Beta)
+                const tRes = await fetch(`${OPENF1_BASE}/championship_teams?session_key=${openf1SessionKey}`);
+                let tData = await tRes.json();
+                
+                tBody.innerHTML = '';
+                // Robust Fallback: Calculate from driver points if teams endpoint is empty
+                if (!tData || tData.length === 0) {
+                    const sums = {};
+                    Object.values(cachedDriversList).forEach(drv => {
+                        const dScore = sortedDrivers.find(d => d.driver_number === drv.driver_number);
+                        if (dScore) {
+                            sums[drv.team_name] = (sums[drv.team_name] || 0) + dScore.points;
+                        }
+                    });
+                    tData = Object.keys(sums).map(name => ({ team_name: name, points: sums[name] }))
+                                             .sort((a,b) => b.points - a.points);
+                    tData.forEach((row, idx) => { row.position = idx + 1; });
+                } else {
+                    tData.sort((a,b) => b.points - a.points);
+                }
+
+                tData.forEach((row, idx) => {
+                    const driversInTeam = Object.values(cachedDriversList).filter(d => d.team_name === row.team_name);
+                    const teamColour = driversInTeam.length > 0 ? driversInTeam[0].team_colour : '94a3b8';
+                    
+                    tBody.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition duration-200">
+                        <td class="py-3 md:py-4 px-3 md:px-6 text-slate-500 dark:text-slate-400 font-mono">${idx + 1}</td>
+                        <td class="py-3 md:py-4 px-3 md:px-6 font-bold uppercase tracking-wide flex items-center gap-2 md:gap-3">
+                            <span class="w-3 h-3 md:w-4 md:h-4 block rounded-sm shadow-sm flex-shrink-0" style="background-color: #${teamColour}"></span>
+                            <div class="flex flex-col">
+                                <span class="text-sm md:text-base">${row.team_name}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 md:py-4 px-3 md:px-6 text-right font-bold text-base md:text-lg">${row.points}</td>
+                    </tr>`;
+                });
+
+            } catch (err) {
+                console.error("Standings fetch error: ", err);
+            } 
+        }
+
+        async function openPastRaceModal(meeting_key, raceName) {
+            const modal = document.getElementById('race-modal'); 
+            const modalContent = document.getElementById('race-modal-content'); 
+            const tbody = document.getElementById('modal-leaderboard-body');
+            
+            modal.classList.remove('hidden'); 
+            modal.classList.add('flex'); 
+            setTimeout(() => { 
+                modal.classList.remove('opacity-0'); 
+                modalContent.classList.remove('scale-95'); 
+                modalContent.classList.add('scale-100'); 
+            }, 10);
+            
+            document.getElementById('modal-race-title').innerText = raceName; 
+            tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-slate-500">Fetching official results...</td></tr>`;
+            
+            try {
+                const sesRes = await fetch(`${OPENF1_BASE}/sessions?meeting_key=${meeting_key}&session_name=Race`);
+                const sesData = await sesRes.json();
+                if (!sesData || sesData.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-red-400">Race results not yet available.</td></tr>`;
+                    return;
+                }
+                
+                const mSessionKey = sesData[0].session_key;
+                const res = await fetch(`${OPENF1_BASE}/session_result?session_key=${mSessionKey}`);
+                const data = await res.json();
+                
+                tbody.innerHTML = ''; 
+                if (data && data.length > 0) {
+                    const dRes = await fetch(`${OPENF1_BASE}/drivers?session_key=${mSessionKey}`);
+                    const dData = await dRes.json();
+                    const localSessionDrivers = {};
+                    dData.forEach(drv => localSessionDrivers[drv.driver_number] = drv);
+                    
+                    const sorted = data.sort((a,b) => a.position - b.position);
+                    sorted.forEach(row => {
+                        const driverMeta = localSessionDrivers[row.driver_number] || { first_name: 'Driver', last_name: '#' + row.driver_number, team_name: '-', team_colour: '94a3b8' };
+                        const avatar = driverMeta.headshot_url || `https://ui-avatars.com/api/?name=${driverMeta.first_name}+${driverMeta.last_name}&background=${driverMeta.team_colour}&color=fff&rounded=true&bold=true&size=128`;
+                        
+                        let gapStatus = row.gap_to_leader === null ? 'Leader' : '+' + row.gap_to_leader + 's';
+                        if (row.dnf) gapStatus = 'DNF';
+                        if (row.dsq) gapStatus = 'DSQ';
+                        
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition duration-200">
+                                <td class="py-3 md:py-4 px-3 md:px-6 text-slate-500 dark:text-slate-400 font-mono">
+                                    <span style="border-left: 4px solid #${driverMeta.team_colour}" class="pl-2 md:pl-3">${row.position}</span>
+                                </td>
+                                <td class="py-3 md:py-4 px-3 md:px-6 font-medium">
+                                    <div class="flex items-center gap-2 md:gap-3">
+                                        <img src="${avatar}" class="w-7 h-7 md:w-9 md:h-9 rounded-full shadow-sm flex-shrink-0 object-cover bg-slate-100 dark:bg-slate-800">
+                                        <div class="flex flex-col">
+                                            <span>${driverMeta.first_name} <span class="font-bold uppercase">${driverMeta.last_name}</span></span>
+                                            <span class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 block md:hidden mt-0.5 leading-tight">${driverMeta.team_name} • ${gapStatus}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 md:py-4 px-6 text-slate-500 dark:text-slate-400 hidden md:table-cell">${driverMeta.team_name}</td>
+                                <td class="py-3 md:py-4 px-6 text-slate-600 dark:text-slate-300 font-mono text-xs md:text-sm hidden sm:table-cell">${gapStatus}</td>
+                                <td class="py-3 md:py-4 px-3 md:px-6 text-right font-bold text-slate-600 dark:text-slate-300">${row.points}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-red-400">Error loading race results.</td></tr>`;
+                }
+            } catch(e) { 
+                console.error(e);
+                tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-red-400">Error loading race results.</td></tr>`; 
             }
         }
 
-        function toggleStandingsMode(mode) {
-            const btnOfficial = document.getElementById('btn-standings-official');
-            const btnLive = document.getElementById('btn-standings-live');
-            activeStandingsTab = mode;
+        function closePastRaceModal() {
+            const modal = document.getElementById('race-modal'); const modalContent = document.getElementById('race-modal-content');
+            modal.classList.add('opacity-0'); modalContent.classList.remove('scale-100'); modalContent.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+        document.getElementById('race-modal').addEventListener('click', function(e) { if (e.target === this) closePastRaceModal(); });
 
-            if (mode === 'official') {
-                btnOfficial.className = "px-3 py-1.5 rounded-md bg-f1red text-white shadow transition-all";
-                btnLive.className = "px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all";
-            } else {
-                btnLive.className = "px-3 py-1.5 rounded-md bg-f1red text-white shadow transition-all";
-                btnOfficial.className = "px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all";
+        async function fetchSchedule() {
+            const currentYear = new Date().getFullYear();
+            try {
+                let res = await fetch(`${OPENF1_BASE}/meetings?year=${currentYear}`);
+                let data = await res.json();
+                if (!data || data.length === 0) {
+                    res = await fetch(`${OPENF1_BASE}/meetings?year=2025`); // robust fallback
+                    data = await res.json();
+                }
+                
+                const container = document.getElementById('schedule-container'); 
+                container.innerHTML = ''; 
+                let nextRaceFound = false;
+                const now = new Date();
+
+                data.forEach((meeting, idx) => {
+                    const startDateObj = new Date(meeting.date_start);
+                    const localDate = startDateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                    
+                    const isPast = now.getTime() > startDateObj.getTime();
+                    let badge = '', cardBorder = 'dark:border-borderdark border-slate-200', cardExtraClass = '', onClickAction = '';
+                    
+                    if (isPast) { 
+                        badge = `<span class="bg-slate-200 dark:bg-cardbg text-slate-500 dark:text-slate-400 px-2 py-1 rounded text-[10px] md:text-xs font-semibold">FINISHED</span>`; 
+                        cardExtraClass = 'cursor-pointer hover:border-slate-400 group'; 
+                        onClickAction = `onclick="openPastRaceModal(${meeting.meeting_key}, '${meeting.meeting_name.replace(/'/g, "\\'")}')"`; 
+                    } 
+                    else if (!nextRaceFound) { 
+                        badge = `<span class="bg-f1red text-white px-2 py-1 rounded text-[10px] md:text-xs font-bold animate-pulse">UPCOMING</span>`; 
+                        cardBorder = 'border-f1red/50'; 
+                        nextRaceFound = true; 
+                        startCountdown(meeting.date_start, meeting.meeting_name); 
+                        initPredictions({ season: meeting.year, round: idx + 1 }); 
+                    } 
+                    else { 
+                        badge = `<span class="bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 px-2 py-1 rounded text-[10px] md:text-xs font-semibold">SCHEDULED</span>`; 
+                    }
+                    
+                    container.innerHTML += `
+                        <div ${onClickAction} class="bg-white dark:bg-cardbg border ${cardBorder} p-4 md:p-5 rounded-xl flex flex-col justify-between hover:-translate-y-1 hover:shadow-lg transition duration-300 ${cardExtraClass}">
+                            <div>
+                                <div class="flex justify-between items-start mb-3">
+                                    <span class="text-xs text-slate-400 font-mono">GP Key ${meeting.meeting_key}</span>
+                                    ${badge}
+                                </div>
+                                <h4 class="font-bold text-base md:text-lg leading-tight mb-1">${meeting.meeting_name}</h4>
+                                <p class="text-[11px] md:text-xs text-slate-500">${meeting.location}, ${meeting.country_name}</p>
+                            </div>
+                            <div class="flex justify-between items-center border-t border-slate-100 dark:border-white/5 pt-3 mt-4">
+                                <span class="font-semibold text-sm text-slate-700 dark:text-slate-200">${localDate}</span>
+                                <span class="text-f1red text-sm font-mono font-bold">${startDateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if(!nextRaceFound) { 
+                    document.getElementById('countdown-label').innerText = "Season Complete"; 
+                    document.getElementById('countdown-title').innerText = "Awaiting Next Season"; 
+                    const predLocked = document.getElementById('pred-locked-overlay');
+                    if(predLocked) predLocked.classList.remove('hidden');
+                }
+
+            } catch (err) {
+                console.error("Schedule error: ", err);
             }
-            fetchStandings();
         }
 
-        // --- GENERAL SETUP CONTROLS ---
-        document.getElementById('auth-modal').addEventListener('click', function(e) { if (e.target === this) closeAuthModal(); });
-        document.getElementById('profile-modal').addEventListener('click', function(e) { if (e.target === this) closeProfileModal(); });
-        document.getElementById('nickname-modal').addEventListener('click', function(e) { if (e.target === this) closeNicknameModal(); });
+        async function fetchNews(isRefresh = false) {
+            const container = document.getElementById('news-container'); const loadMoreBtn = document.getElementById('load-more-container');
+            if (isRefresh) { container.innerHTML = '<p class="text-slate-500 py-4 col-span-full">Refreshing news...</p>'; loadMoreBtn.classList.add('hidden'); }
+            try {
+                const res = await fetch(NEWS_API + (isRefresh ? `&_=${new Date().getTime()}` : '')); const data = await res.json();
+                allNewsItems = data.items || []; displayedNewsCount = 0; container.innerHTML = '';
+                if (allNewsItems.length > 0) renderNewsBatch();
+            } catch (err) { console.error(err); }
+        }
 
-        function playF1Sound() { const audio = document.getElementById('f1-audio'); if(audio) { audio.currentTime = 0; audio.play().catch(e=>console.log(e)); } }
+        function renderNewsBatch() {
+            const container = document.getElementById('news-container'); const loadMoreBtn = document.getElementById('load-more-container');
+            const nextBatch = allNewsItems.slice(displayedNewsCount, displayedNewsCount + NEWS_BATCH_SIZE);
+            nextBatch.forEach(article => {
+                const imageUrl = article.enclosure && article.enclosure.link ? article.enclosure.link : 'https://images.unsplash.com/photo-1532983330958-4b32abe9deee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                container.innerHTML += `<a href="${article.link}" target="_blank" class="opacity-0 animate-fade-in group block bg-white dark:bg-cardbg rounded-xl overflow-hidden border border-slate-200 dark:border-borderdark hover:border-slate-400 dark:hover:border-slate-500 transition duration-300 flex flex-col h-full shadow-sm hover:shadow-md"><div class="h-40 w-full bg-cover bg-center" style="background-image: url('${imageUrl}')"></div><div class="p-4 md:p-5 flex flex-col flex-grow"><h3 class="font-bold text-sm text-slate-800 dark:text-slate-200 group-hover:text-f1red transition leading-snug line-clamp-3 mb-2 md:mb-3">${article.title}</h3><p class="text-xs text-slate-500 mt-auto">${new Date(article.pubDate).toLocaleDateString()}</p></div></a>`;
+            });
+            displayedNewsCount += nextBatch.length;
+            displayedNewsCount < allNewsItems.length ? loadMoreBtn.classList.remove('hidden') : loadMoreBtn.classList.add('hidden');
+        }
+        function loadMoreNews() { renderNewsBatch(); } function refreshNews() { fetchNews(true); }
 
         document.addEventListener('DOMContentLoaded', () => {
-            fetchSchedule(); 
-            fetchRaceTracker(); 
-            fetchStandings(); 
-            fetchNews();
-            setInterval(fetchRaceTracker, 60000);
+            initOpenF1Dashboard();
         });
     </script>
 </body>
